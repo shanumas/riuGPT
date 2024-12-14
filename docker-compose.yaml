@@ -4,7 +4,7 @@ services:
     volumes:
       - ./frontend/src:/app/src
     environment:
-      - VITE_API_HOST=http://http://riugpt.southindia.cloudapp.azure.com:7091
+      - VITE_API_HOST=riugpt.southindia.cloudapp.azure.com:7091
       - VITE_API_STREAMING=$VITE_API_STREAMING
     ports:
       - "5173:5173"
