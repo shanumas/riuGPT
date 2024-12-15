@@ -3,6 +3,7 @@ from typing import Optional
 import os
 
 from pydantic_settings import BaseSettings
+from typing import ClassVar
 
 current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
