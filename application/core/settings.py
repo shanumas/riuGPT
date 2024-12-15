@@ -21,7 +21,8 @@ class Settings(BaseSettings):
     PARSE_PDF_AS_IMAGE: bool = False
     VECTOR_STORE: str = "faiss" #  "faiss" or "elasticsearch" or "qdrant" or "milvus" or "lancedb"
     RETRIEVERS_ENABLED: list = ["classic_rag"]
-    AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=riugpt;AccountKey=7qgFNhx/C462Dl4LrDskBDbiuX9ap6tS74sim4PZVrFWaUk+lmpzUX/Wx2lFmpuA58iQMjG2H8GT+AStkhPNWw==;EndpointSuffix=core.windows.net"
+    AZURE_STORAGE_CONNECTION_STRING: ClassVar[str] = 'DefaultEndpointsProtocol=https;AccountName=riugpt;AccountKey=7qgFNhx/C462Dl4LrDskBDbiuX9ap6tS74sim4PZVrFWaUk+lmpzUX/Wx2lFmpuA58iQMjG2H8GT+AStkhPNWw==;EndpointSuffix=core.windows.net'
+    AZURE_STORAGE_CONTAINER_NAME: ClassVar[str] = 'inputs'
 
     # LLM Cache
     CACHE_REDIS_URL: str = "redis://localhost:6379/2"
