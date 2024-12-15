@@ -35,10 +35,6 @@ def metadata_from_filename(title):
 def generate_random_string(length):
     return "".join([string.ascii_letters[i % 52] for i in range(length)])
 
-current_dir = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-)
-
 def extract_zip_recursive(zip_path, extract_to, current_depth=0, max_depth=5):
     """
     Recursively extract zip files with a limit on recursion depth.

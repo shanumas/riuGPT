@@ -6,6 +6,10 @@ from bson.objectid import ObjectId
 
 from application.core.mongo_db import MongoDB
 from application.core.settings import settings
+from azure.storage.blob import BlobServiceClient
+
+blob_service_client = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
+container_client = blob_service_client.get_container_client(settings.AZURE_STORAGE_CONTAINER_NAME)
 
 mongo = MongoDB.get_client()
 db = mongo["docsgpt"]

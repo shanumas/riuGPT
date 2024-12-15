@@ -255,26 +255,47 @@ class DeleteOldIndexes(Resource):
             )
 
         doc = sources_collection.find_one(
-                {"_id": ObjectId(source_id), "user": "local"}
+            {"_id": ObjectId(source_id), "user": "local"}
         )
         if not doc:
-                return make_response(jsonify({"status": "not found"}), 404)
+            return make_response(jsonify({"status": "not found"}), 404)
+        
         try:
             if settings.VECTOR_STORE == "faiss":
-                shutil.rmtree(os.path.join(current_dir, "indexes", str(doc["_id"])))
+                # Define the prefix based on your Blob Storage structure
+                # For example, if indexes are stored under 'indexes/<source_id>/', set prefix accordingly
+                prefix = f"indexes/{source_id}/"  # Adjust this prefix as needed
+
+                # List all blobs with the specified prefix
+                blobs_to_delete = container_client.list_blobs(name_starts_with=prefix)
+
+                # Delete each blob
+                for blob in blobs_to_delete:
+                    print(f"Deleting blob: {blob.name}")
+                    container_client.delete_blob(blob.name)
+
             else:
+                # Handle other vector stores if they involve Blob Storage
+                # For example, if using Elasticsearch or Qdrant, implement their specific deletion logic
+                # If they don't use Blob Storage, retain or modify existing logic accordingly
                 vectorstore = VectorCreator.create_vectorstore(
                     settings.VECTOR_STORE, source_id=str(doc["_id"])
                 )
                 vectorstore.delete_index()
 
-        except FileNotFoundError:
-            pass
         except Exception as err:
+            print(f"Error deleting indexes: {err}")
             return make_response(jsonify({"success": False, "error": str(err)}), 400)
         
-        sources_collection.delete_one({"_id": ObjectId(source_id)})
+        # After deleting the indexes, remove the source document from MongoDB
+        try:
+            sources_collection.delete_one({"_id": ObjectId(source_id)})
+        except Exception as err:
+            print(f"Error deleting source document: {err}")
+            return make_response(jsonify({"success": False, "error": str(err)}), 400)
+        
         return make_response(jsonify({"success": True}), 200)
+
 
 
 @user_ns.route("/api/upload")
@@ -290,7 +311,7 @@ class UploadFile(Resource):
         )
     )
     @api.doc(
-        description="Uploads a file to be vectorized and indexed",
+        description="Uploads file(s) to be vectorized and indexed (handled one by one)",
     )
     def post(self):
         data = request.form
@@ -311,84 +332,52 @@ class UploadFile(Resource):
         user = secure_filename(request.form["user"])
         job_name = secure_filename(request.form["name"])
         doc_type = secure_filename(request.form["type"])
+
+        allowed_ext = [
+            ".rst",
+            ".md",
+            ".pdf",
+            ".txt",
+            ".docx",
+            ".csv",
+            ".epub",
+            ".html",
+            ".mdx",
+            ".json",
+            ".xlsx",
+            ".pptx",
+            ".png",
+            ".jpg",
+            ".jpeg",
+        ]
+
         try:
-            save_dir = os.path.join(current_dir, settings.UPLOAD_FOLDER, user, job_name)
-            os.makedirs(save_dir, exist_ok=True)
+            # For multiple files, we will process each individually.
+            task_ids = []
 
-            if len(files) > 1:
-                temp_dir = os.path.join(save_dir, "temp")
-                os.makedirs(temp_dir, exist_ok=True)
-
-                for file in files:
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(temp_dir, filename))
-                    print(f"Saved file: {filename}")
-                zip_path = shutil.make_archive(
-                    base_name=os.path.join(save_dir, job_name),
-                    format="zip",
-                    root_dir=temp_dir,
-                )
-                final_filename = os.path.basename(zip_path)
-                shutil.rmtree(temp_dir)
-                task = ingest.delay(
-                    settings.UPLOAD_FOLDER,
-                    [
-                        ".rst",
-                        ".md",
-                        ".pdf",
-                        ".txt",
-                        ".docx",
-                        ".csv",
-                        ".epub",
-                        ".html",
-                        ".mdx",
-                        ".json",
-                        ".xlsx",
-                        ".pptx",
-                        ".png",
-                        ".jpg",
-                        ".jpeg",
-                    ],
-                    job_name,
-                    final_filename,
-                    user,
-                    doc_type
-                )
-            else:
-                file = files[0]
+            for file in files:
                 final_filename = secure_filename(file.filename)
-                file_path = os.path.join(save_dir, final_filename)
-                file.save(file_path)
+                blob_client = container_client.get_blob_client(final_filename)
+                blob_client.upload_blob(file, overwrite=True)
 
                 task = ingest.delay(
                     settings.UPLOAD_FOLDER,
-                    [
-                        ".rst",
-                        ".md",
-                        ".pdf",
-                        ".txt",
-                        ".docx",
-                        ".csv",
-                        ".epub",
-                        ".html",
-                        ".mdx",
-                        ".json",
-                        ".xlsx",
-                        ".pptx",
-                        ".png",
-                        ".jpg",
-                        ".jpeg",
-                    ],
+                    allowed_ext,
                     job_name,
                     final_filename,
                     user,
                     doc_type
                 )
+                task_ids.append(task.id)
 
         except Exception as err:
             print(f"Error: {err}")
             return make_response(jsonify({"success": False, "error": str(err)}), 400)
-        return make_response(jsonify({"success": True, "task_id": task.id}), 200)
+
+        # If multiple files were uploaded, return all task IDs.
+        # If only one file, it's still a list with one item.
+        return make_response(jsonify({"success": True, "task_ids": task_ids}), 200)
+
 
 
 @user_ns.route("/api/remote")
