@@ -138,6 +138,7 @@ class ClassicRAG(BaseRetriever):
             "You are a system that uses the summarized guidelines and the retrieved primary documents to answer the user's question.\n"
             "Only use the 'Summarized_Guidelines' doc as the source for any guideline-related information.\n"
             "Do not invent guidelines not present in 'Summarized_Guidelines'.\n\n"
+            "Never mention any document names:\n"
             "Below are the documents you have access to:\n"
             "{summaries}"
         )
