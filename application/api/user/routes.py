@@ -21,6 +21,7 @@ from application.vectorstore.vector_creator import VectorCreator
 from application.tts.google_tts import GoogleTTS
 
 from azure.storage.blob import BlobServiceClient
+from azure.core.exceptions import ResourceNotFoundError
 
 blob_service_client = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
 container_client = blob_service_client.get_container_client(settings.AZURE_STORAGE_CONTAINER_NAME)
@@ -357,14 +358,26 @@ class UploadFile(Resource):
 
             for file in files:
                 final_filename = secure_filename(file.filename)
+                base_name, ext = os.path.splitext(final_filename)
+
                 blob_client = container_client.get_blob_client(final_filename)
-                blob_client.upload_blob(file, overwrite=True)
+                counter = 1
+                while True:
+                    try:
+                        blob_client.get_blob_properties()  # check if blob exists
+                        new_filename = f"{base_name}({counter}){ext}"
+                        blob_client = container_client.get_blob_client(new_filename)
+                        counter += 1
+                    except ResourceNotFoundError:
+                        break
+
+                blob_client.upload_blob(file, overwrite=False)
 
                 task = ingest.delay(
                     settings.UPLOAD_FOLDER,
                     allowed_ext,
                     job_name,
-                    final_filename,
+                    blob_client.blob_name,  # pass updated name
                     user,
                     doc_type
                 )
