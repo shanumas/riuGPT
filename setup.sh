@@ -39,21 +39,20 @@ check_and_start_docker() {
 
     # Check if Docker is running
     if ! docker info > /dev/null 2>&1; then
-        echo "Docker is not running. Starting Docker..."
-        if ! pgrep -x "dockerd" > /dev/null; then
-            echo "Starting Docker daemon..."
-            sudo dockerd > /dev/null 2>&1 &
-            sleep 50
-        fi
+        echo "Docker is not running. Attempting to start via systemctl..."
+        sudo systemctl start docker
+        sleep 1000  # give Docker some time to finish starting
 
-        # Verify Docker is running
+        # Verify Docker is actually running now
         if ! docker info > /dev/null 2>&1; then
-            echo "Failed to start Docker. Please start it manually."
+            echo "Failed to start Docker via systemctl. Please start it manually."
             exit 1
         fi
     fi
+
     echo "Docker is running."
 }
+
 
 # Function to handle the choice to download the model locally
 download_locally() {
