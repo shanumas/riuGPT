@@ -49,7 +49,7 @@ check_and_start_docker() {
     # Check if Docker is running
     if ! docker info > /dev/null 2>&1; then
         echo "Docker is not running. Attempting to start via systemctl..."
-        sudo systemctl start docker
+        sudo service docker start
         sleep 5  # Give Docker some time to start
 
         if ! docker info > /dev/null 2>&1; then
