@@ -122,4 +122,3 @@ use_docsgpt() {
 
 # Prompt the user for their choice
 use_docsgpt
-
