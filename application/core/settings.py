@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # LLM Cache
     CACHE_REDIS_URL: str = "redis://localhost:6379/2"
 
-    API_URL: str = "http://riugpt.southindia.cloudapp.azure.com:7091"  # backend url for celery worker
+    API_URL: str = "http://localhost:7091"  # backend url for celery worker
 
     API_KEY: Optional[str] = None  # LLM api key
     EMBEDDINGS_KEY: Optional[str] = None  # api key for embeddings (if using openai, just copy API_KEY)
