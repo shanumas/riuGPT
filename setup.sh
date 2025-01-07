@@ -39,19 +39,15 @@ check_and_start_docker() {
 
     # Check if Docker is running
     if ! docker info > /dev/null 2>&1; then
-        echo "Docker is not running. Starting Docker..."
-        if ! pgrep -x "dockerd" > /dev/null; then
-            echo "Starting Docker daemon..."
-            sudo dockerd > /dev/null 2>&1 &
-            sleep 5
-        fi
-
-        # Verify Docker is running
-        if ! docker info > /dev/null 2>&1; then
-            echo "Failed to start Docker. Please start it manually."
-            exit 1
-        fi
-    fi
+	  echo "Docker is not running. Attempting to start via systemctl..."
+	  sudo systemctl start docker
+	  sleep 5
+	
+	  if ! docker info > /dev/null 2>&1; then
+	    echo "Failed to start Docker via systemctl. Please start it manually."
+	    exit 1
+	  fi
+	fi
     echo "Docker is running."
 }
 
