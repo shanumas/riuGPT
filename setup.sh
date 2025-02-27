@@ -3,7 +3,7 @@
 # Function to prompt the user for their choice
 prompt_user() {
     echo "Do you want to:"
-    echo "1. Use DocsGPT public API (simple and free)"
+    echo "1. Use RIUs public API (simple and free)"
     echo "2. Download the language model locally (12GB)"
     echo "3. Use the OpenAI API (requires an API key)"
     read -p "Enter your choice (1, 2 or 3): " choice
