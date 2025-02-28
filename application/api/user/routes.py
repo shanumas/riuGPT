@@ -316,8 +316,9 @@ class UploadFile(Resource):
 
                 for file in files:
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(temp_dir, filename))
-                    print(f"Saved file: {filename}")
+                    first_word = filename.split()[0]  # Extract the first word
+                    file.save(os.path.join(temp_dir, first_word))
+
                 zip_path = shutil.make_archive(
                     base_name=os.path.join(save_dir, job_name),
                     format="zip",
@@ -351,7 +352,7 @@ class UploadFile(Resource):
                 )
             else:
                 file = files[0]
-                final_filename = secure_filename(file.filename)
+                final_filename = secure_filename(file.filename).split()[0]
                 file_path = os.path.join(save_dir, final_filename)
                 file.save(file_path)
 
