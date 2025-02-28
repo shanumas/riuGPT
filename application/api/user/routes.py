@@ -304,7 +304,7 @@ class UploadFile(Resource):
             )
 
         user = secure_filename(request.form["user"])
-        job_name = secure_filename(request.form["name"])
+        job_name = secure_filename(request.form["name"])[:3]
         doc_type = secure_filename(request.form["type"])
         try:
             save_dir = os.path.join(current_dir, settings.UPLOAD_FOLDER, user, job_name)
@@ -316,9 +316,8 @@ class UploadFile(Resource):
 
                 for file in files:
                     filename = secure_filename(file.filename)
-                    first_word = filename[:5]  # Extract the first word
-                    file.save(os.path.join(temp_dir, first_word))
-
+                    file.save(os.path.join(temp_dir, filename))
+                    print(f"Saved file: {filename}")
                 zip_path = shutil.make_archive(
                     base_name=os.path.join(save_dir, job_name),
                     format="zip",
@@ -352,7 +351,7 @@ class UploadFile(Resource):
                 )
             else:
                 file = files[0]
-                final_filename = secure_filename(file.filename)[:5]
+                final_filename = secure_filename(file.filename)
                 file_path = os.path.join(save_dir, final_filename)
                 file.save(file_path)
 
