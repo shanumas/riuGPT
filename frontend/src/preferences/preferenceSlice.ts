@@ -15,6 +15,7 @@ export interface Preference {
   token_limit: number;
   selectedDocs: Doc | null;
   selectedGuideDocs: Doc | null;
+  selectedMouDocs: Doc | null;
   sourceDocs: Doc[] | null;
   sourceGuideDocs: Doc[] | null;
   conversations: {
@@ -40,6 +41,15 @@ const initialState: Preference = {
     retriever: 'classic',
   } as Doc,
   selectedGuideDocs: {
+    id: 'default',
+    name: 'default',
+    type: 'remote',
+    date: 'default',
+    docLink: 'default',
+    model: 'openai_text-embedding-ada-002',
+    retriever: 'classic',
+  } as Doc,
+  selectedMouDocs: {
     id: 'default',
     name: 'default',
     type: 'remote',
@@ -181,6 +191,8 @@ export const selectSelectedDocs = (state: RootState) =>
   state.preference.selectedDocs;
 export const selectSelectedGuideDocs = (state: RootState) =>
   state.preference.selectedGuideDocs;
+export const selectSelectedMouDocs = (state: RootState) =>
+  state.preference.selectedMouDocs;
 export const selectConversations = (state: RootState) =>
   state.preference.conversations;
 export const selectConversationId = (state: RootState) =>

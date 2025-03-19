@@ -15,20 +15,20 @@
   "documentation": "Documentation",
   "demo": [
     {
-      "header": "Emission",
-      "query": "How did our carbon emissions this year compare to last year?"
+      "header": "Claim Coverage",
+      "query": "Does this claim fall under the policy coverage?"
     },
     {
-      "header": "Human Rights",
-      "query": "Which sections of our report align with the GRI guidelines on human rights?"
+      "header": "Required Documents",
+      "query": "Are all necessary documents submitted for this claim?"
     },
     {
-      "header": "Achievement summary",
-      "query": "Summarize our key ESG achievements from the latest reporting cycle."
+      "header": "Policy Exclusions",
+      "query": "Does this claim have any exclusions under the policy?"
     },
     {
-      "header": "Gaps & Improvements",
-      "query": "Which areas need more improvement based on our recent ESG metrics?"
+      "header": "Fraud & Errors",
+      "query": "Are there any inconsistencies, fraud risks, or missing details in this claim?"
     }
   ],
   "settings": {

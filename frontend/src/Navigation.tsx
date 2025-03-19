@@ -41,6 +41,7 @@ import {
   setPaginatedDocuments,
   selectGuideSourceDocs,
   selectSelectedGuideDocs,
+  selectSelectedMouDocs,
 } from './preferences/preferenceSlice';
 import Spinner from './assets/spinner.svg';
 import SpinnerDark from './assets/spinner-dark.svg';
@@ -59,6 +60,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
   const guideDocs = useSelector(selectGuideSourceDocs);
   const selectedDocs = useSelector(selectSelectedDocs);
   const selectedGuideDocs = useSelector(selectSelectedGuideDocs);
+  const selectedMouDocs = useSelector(selectSelectedMouDocs);
   const conversations = useSelector(selectConversations);
   const modalStateDeleteConv = useSelector(selectModalStateDeleteConv);
   const conversationId = useSelector(selectConversationId);
@@ -69,6 +71,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
   const [isDarkTheme] = useDarkTheme();
   const [isDocsListOpen, setIsDocsListOpen] = useState(false);
   const [isGuideDocsListOpen, setIsGuideDocsListOpen] = useState(false);
+  const [isMouDocsListOpen, setIsMouDocsListOpen] = useState(false);
 
   const { t } = useTranslation();
   const isApiKeySet = useSelector(selectApiKeyStatus);
@@ -359,6 +362,35 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
             <div className="relative my-4 mx-4 flex gap-2">
               <SourceDropdown
                 options={guideDocs ?? null}
+                selectedDocs={selectedMouDocs}
+                setSelectedDocs={selectSelectedMouDocs}
+                isDocsListOpen={isMouDocsListOpen}
+                setIsDocsListOpen={setIsMouDocsListOpen}
+                handleDeleteClick={(doc: Doc) => handleDeleteClick(doc, 'mou')}
+                handlePostDocumentSelect={(option?: string) => {
+                  if (isMobile) {
+                    setNavOpen(!navOpen);
+                  }
+                }}
+                setSelectedGuideDocs={undefined}
+              />
+              <img
+                className="mt-2 h-9 w-9 hover:cursor-pointer"
+                src={UploadIcon}
+                onClick={() => {
+                  setUploadModalStateGuide('ACTIVE');
+                  if (isMobile) {
+                    setNavOpen(!navOpen);
+                  }
+                }}
+              ></img>
+            </div>
+            <p className="ml-5 mt-3 text-sm font-semibold">MOU</p>
+          </div>
+          <div className="flex flex-col-reverse border-b-[1px] dark:border-b-purple-taupe">
+            <div className="relative my-4 mx-4 flex gap-2">
+              <SourceDropdown
+                options={guideDocs ?? null}
                 selectedDocs={selectedGuideDocs}
                 setSelectedDocs={setSelectedGuideDocs}
                 isDocsListOpen={isGuideDocsListOpen}
@@ -413,7 +445,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                 }}
               ></img>
             </div>
-            <p className="ml-5 mt-3 text-sm font-semibold">User files</p>
+            <p className="ml-5 mt-3 text-sm font-semibold">Patient records</p>
           </div>
           <div className="flex flex-col gap-2 border-b-[1px] py-2 dark:border-b-purple-taupe">
             <NavLink

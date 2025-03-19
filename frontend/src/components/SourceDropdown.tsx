@@ -9,6 +9,7 @@ type Props = {
   selectedDocs: Doc | null;
   setSelectedDocs: any;
   setSelectedGuideDocs: any;
+  setSelectedMouDocs: any;
   isDocsListOpen: boolean;
   setIsDocsListOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleDeleteClick: any;
@@ -19,6 +20,7 @@ function SourceDropdown({
   options,
   setSelectedDocs,
   setSelectedGuideDocs,
+  setSelectedMouDocs,
   selectedDocs,
   setIsDocsListOpen,
   isDocsListOpen,

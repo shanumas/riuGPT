@@ -57,37 +57,38 @@ class ClassicRAG(BaseRetriever):
         ]
         return docs
 
-    def _retrieve_guidelines(self):
+    def _retrieve_policy(self):
         """
-        Retrieve the exact guidelines from the additional vector store.
+        Retrieve the exact policy details from the additional vector store.
         """
         if not self.additional_vectorstore:
             print("Additional vector store not initialized.")
             return ""
 
-        guidelines_docs = self._get_data_from_vectorstore(self.additional_vectorstore, k=2)
+        policy_docs = self._get_data_from_vectorstore(self.additional_vectorstore, k=2)
 
-        if not guidelines_docs:
+        if not policy_docs:
             print("No guidelines found in the additional vector store.")
             return ""
 
-        guidelines_text = "\n".join(doc["text"] for doc in guidelines_docs)
-        return guidelines_text
+        policy_text = "\n".join(doc["text"] for doc in policy_docs)
+        return policy_text
 
-    def _summarize_guidelines(self, guidelines_text):
+    def _summarize_policy(self, policy_text):
         """
-        First LLM call: Summarize the guidelines_text.
+        First LLM call: Summarize the policy_text.
         This ensures that all guideline-related info is prepared before checking primary docs.
         """
-        if not guidelines_text.strip():
+        if not policy_text.strip():
             return "No guidelines available."
 
         # Prompt for summarizing guidelines
         summary_prompt = (
-            "You are an assistant that reads sustainability/ESG reporting guidelines.\n"
-            "Please summarize the key points related to emissions reporting found in the provided guidelines.\n\n"
-            "GUIDELINES:\n" + guidelines_text
+            "You are an assistant that reads medical insurance policy.\n"
+            "Please summarize the key points related to claims adjudication found in the provided policy.\n\n"
+            "POLICY GUIDELINES:\n" + policy_text
         )
+
 
         llm = LLMCreator.create_llm(
             settings.LLM_NAME, api_key=settings.API_KEY, user_api_key=self.user_api_key
@@ -107,10 +108,10 @@ class ClassicRAG(BaseRetriever):
 
     def gen(self):
         # Step 1: Retrieve guidelines
-        guidelines_text = self._retrieve_guidelines()
+        policy_summary = self._retrieve_policy()
 
         # Step 2: Summarize the guidelines with the first LLM call
-        policy_text = self._summarize_guidelines(guidelines_text)
+        policy_summary = self._summarize_policy(policy_summary)
 
         # Step 3: Retrieve primary documents
         primary_docs = self._retrieve_primary_docs()
@@ -118,10 +119,10 @@ class ClassicRAG(BaseRetriever):
         # Combine summarized guidelines and primary docs
         # We now have a prepared guidelines summary and the primary data
         docs = primary_docs.copy()
-        if policy_text:
+        if policy_summary:
             docs.append({
-                "title": "policy_title",
-                "text": policy_text,
+                "title": "policy_summary",
+                "text": policy_summary,
                 "source": "policy_summary"
             })
 
@@ -135,19 +136,28 @@ class ClassicRAG(BaseRetriever):
 
         # System prompt for second call: instruct the LLM to use summarized guidelines + primary docs
         system_prompt = (
-            "You are a system that uses the summarized guidelines and the retrieved primary documents to answer the user's question.\n"
-            "Only use the 'policy_title' doc as the source for any guideline-related information.\n"
-            "Do not invent guidelines not present in 'policy_title'.\n\n"
+            "You are a system that adjudicates medical insurance claims based on summarized policy document and retrieved primary documents.\n"
+            "Only use the 'policy_title' document as the source for policy-related decisions.\n"
+            "Do not create or assume policy details not present in 'policy_title'.\n\n"
             "Below are the documents you have access to:\n"
-            "{summaries}"
+            "{summaries}\n\n"
+            "If a claim is provided, validate it against policy coverage, exclusions, and required documents.\n"
+            "If no claim is provided, summarize the policy's general coverage terms and advise the user to submit claim details for adjudication."
         )
-
+        
+        # Ensure system instructions are structured properly
         p_chat_combine = system_prompt.replace("{summaries}", docs_together)
 
-        messages_combine = [
-            {"role": "system", "content": p_chat_combine},
-            {"role": "user", "content": self.question + "\n\nUse the primary documents to determine actual emissions data if available."}
-        ]
+        # Initialize message list
+        messages_combine = [{"role": "system", "content": p_chat_combine}]
+
+        # Format the user query to handle missing claims
+        user_query = self.question.strip()
+        if "claim" not in user_query.lower():
+            user_query += "\n\nIf no claim is provided, summarize the policy's general coverage terms and advise on next steps."
+
+        # Append the user query to messages
+        messages_combine.append({"role": "user", "content": user_query})
 
         # Add chat history if needed
         if len(self.chat_history) > 1:
@@ -170,14 +180,14 @@ class ClassicRAG(BaseRetriever):
 
     def search(self):
         # Returns combined data for debugging or other purposes
-        guidelines_text = self._retrieve_guidelines()
+        policy_text = self._retrieve_policy()
         primary_docs = self._retrieve_primary_docs()
         combined_docs = primary_docs.copy()
-        if guidelines_text:
+        if policy_text:
             combined_docs.append({
-                "title": "policy_doc",
-                "text": guidelines_text,
-                "source": "guidelines"
+                "title": "policy_text",
+                "text": policy_text,
+                "source": "policy_text"
             })
         return combined_docs
     
