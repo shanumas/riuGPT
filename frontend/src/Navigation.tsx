@@ -7,7 +7,7 @@ import userService from './api/services/userService';
 import Add from './assets/add.svg';
 import openNewChat from './assets/openNewChat.svg';
 import Hamburger from './assets/hamburger.svg';
-import DocsGPT3 from './assets/riu.png';
+import DocsGPT3 from './assets/aid.webp';
 import Expand from './assets/expand.svg';
 import SettingGear from './assets/settingGear.svg';
 import UploadIcon from './assets/upload.svg';
@@ -249,7 +249,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                 />
               </button>
             )}
-            <div className="text-[#949494] font-medium text-[20px]">riuGPT</div>
+            <div className="text-[#949494] font-medium text-[20px]">AID</div>
           </div>
         </div>
       )}
@@ -272,7 +272,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
           >
             <a href="/" className="flex gap-1.5">
               <img className="mb-2 h-10" src={DocsGPT3} alt="" />
-              <p className="my-auto text-2xl font-semibold">riuGPT</p>
+              <p className="my-auto text-2xl font-semibold">AID</p>
             </a>
           </div>
           <button
@@ -384,7 +384,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                 }}
               ></img>
             </div>
-            <p className="ml-5 mt-3 text-sm font-semibold">Guidelines</p>
+            <p className="ml-5 mt-3 text-sm font-semibold">Policy</p>
           </div>
           <div className="flex flex-col-reverse border-b-[1px] dark:border-b-purple-taupe">
             <div className="relative my-4 mx-4 flex gap-2">
@@ -454,7 +454,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
               className="w-7 filter dark:invert"
             />
           </button>
-          <div className="text-[#949494] font-medium text-[20px]">riuGPT</div>
+          <div className="text-[#949494] font-medium text-[20px]">AID</div>
         </div>
       </div>
       <APIKeyModal

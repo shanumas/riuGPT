@@ -110,7 +110,7 @@ class ClassicRAG(BaseRetriever):
         guidelines_text = self._retrieve_guidelines()
 
         # Step 2: Summarize the guidelines with the first LLM call
-        summarized_guidelines = self._summarize_guidelines(guidelines_text)
+        policy_text = self._summarize_guidelines(guidelines_text)
 
         # Step 3: Retrieve primary documents
         primary_docs = self._retrieve_primary_docs()
@@ -118,11 +118,11 @@ class ClassicRAG(BaseRetriever):
         # Combine summarized guidelines and primary docs
         # We now have a prepared guidelines summary and the primary data
         docs = primary_docs.copy()
-        if summarized_guidelines:
+        if policy_text:
             docs.append({
-                "title": "Summarized_Guidelines",
-                "text": summarized_guidelines,
-                "source": "guidelines_summary"
+                "title": "policy_title",
+                "text": policy_text,
+                "source": "policy_summary"
             })
 
         # Yield sources before the second call
@@ -136,8 +136,8 @@ class ClassicRAG(BaseRetriever):
         # System prompt for second call: instruct the LLM to use summarized guidelines + primary docs
         system_prompt = (
             "You are a system that uses the summarized guidelines and the retrieved primary documents to answer the user's question.\n"
-            "Only use the 'Summarized_Guidelines' doc as the source for any guideline-related information.\n"
-            "Do not invent guidelines not present in 'Summarized_Guidelines'.\n\n"
+            "Only use the 'policy_title' doc as the source for any guideline-related information.\n"
+            "Do not invent guidelines not present in 'policy_title'.\n\n"
             "Below are the documents you have access to:\n"
             "{summaries}"
         )
@@ -175,7 +175,7 @@ class ClassicRAG(BaseRetriever):
         combined_docs = primary_docs.copy()
         if guidelines_text:
             combined_docs.append({
-                "title": "Guidelines_doc",
+                "title": "policy_doc",
                 "text": guidelines_text,
                 "source": "guidelines"
             })

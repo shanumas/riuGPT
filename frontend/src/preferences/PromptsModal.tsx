@@ -37,7 +37,7 @@ function AddPrompt({
           Add Prompt
         </p>
         <p className="mb-7 text-xs text-[#747474] dark:text-[#7F7F82]">
-          Add your custom prompt and save it to riuGPT
+          Add your custom prompt and save it to AID
         </p>
         <div>
           <Input
@@ -112,7 +112,7 @@ function EditPrompt({
           Edit Prompt
         </p>
         <p className="mb-7 text-xs text-[#747474] dark:text-[#7F7F82]">
-          Edit your custom prompt and save it to riuGPT
+          Edit your custom prompt and save it to AID
         </p>
         <div>
           <Input

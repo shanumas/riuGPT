@@ -191,7 +191,7 @@ export const SharedConversation = () => {
             <h2 className="font-semi-bold text-base text-chinese-black dark:text-chinese-silver">
               {t('sharedConv.subtitle')}{' '}
               <a href="/" className="text-[#007DFF]">
-                riuGPT
+                AID
               </a>
             </h2>
             <h2 className="font-semi-bold text-base text-chinese-black dark:text-chinese-silver">

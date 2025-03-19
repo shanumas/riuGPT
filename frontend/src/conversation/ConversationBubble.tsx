@@ -9,7 +9,7 @@ import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
-import DocsGPT3 from '../assets/riu.png';
+import DocsGPT3 from '../assets/aid.webp';
 import Dislike from '../assets/dislike.svg?react';
 import Document from '../assets/document.svg';
 import Like from '../assets/like.svg?react';
@@ -299,7 +299,7 @@ const ConversationBubble = forwardRef<
               avatar={
                 <img
                   src={DocsGPT3}
-                  alt="riuGPT"
+                  alt="AID"
                   className="h-full w-full object-cover"
                 />
               }

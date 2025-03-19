@@ -38,7 +38,7 @@ def home():
     if request.remote_addr in ("0.0.0.0", "127.0.0.1", "localhost", "172.18.0.1"):
         return redirect("http://localhost:5173")
     else:
-        return "Welcome to riuGPT Backend!"
+        return "Welcome to AID Backend!"
 
 
 @app.after_request

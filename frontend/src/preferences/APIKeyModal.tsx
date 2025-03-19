@@ -59,9 +59,9 @@ export default function APIKeyModal({
           >
             <p className="text-xl text-jet">OpenAI API Key</p>
             <p className="text-md leading-6 text-gray-500">
-              Before you can start using riuGPT we need you to provide an API
-              key for llm. Currently, we support only OpenAI but soon many more.
-              You can find it here.
+              Before you can start using AID we need you to provide an API key
+              for llm. Currently, we support only OpenAI but soon many more. You
+              can find it here.
             </p>
             <Input
               type="text"

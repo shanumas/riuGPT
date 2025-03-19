@@ -1,14 +1,14 @@
 //TODO - Add hyperlinks to text
 //TODO - Styling
-import DocsGPT3 from './assets/riu.png';
+import DocsGPT3 from './assets/aid.webp';
 
 export default function About() {
   return (
     <div className="mx-5 grid min-h-screen md:mx-36">
       <article className="place-items-left mx-auto my-auto flex w-full max-w-6xl flex-col gap-4 rounded-3xl bg-gray-100 p-6 text-jet dark:bg-gun-metal dark:text-bright-gray lg:p-6 xl:p-10">
         <div className="flex items-center">
-          <p className="mr-2 text-3xl">About riuGPT</p>
-          <img className="h14 mb-2" src={DocsGPT3} alt="riuGPT" />
+          <p className="mr-2 text-3xl">About AID</p>
+          <img className="h14 mb-2" src={DocsGPT3} alt="AID" />
         </div>
         <p className="mt-4">
           Find the information in your documentation through AI-powered
@@ -64,10 +64,10 @@ export default function About() {
 
         <p>
           Currently It uses{' '}
-          <span className="text-blue-950 font-medium">riuGPT</span>{' '}
-          documentation, so it will respond to information relevant to{' '}
-          <span className="text-blue-950 font-medium">riuGPT</span>. If you want
-          to train it on different documentation - please follow
+          <span className="text-blue-950 font-medium">AID</span> documentation,
+          so it will respond to information relevant to{' '}
+          <span className="text-blue-950 font-medium">AID</span>. If you want to
+          train it on different documentation - please follow
           <a
             className="text-blue-500"
             href="https://github.com/arc53/DocsGPT/wiki/How-to-train-on-other-documentation"

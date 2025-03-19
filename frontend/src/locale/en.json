@@ -6,7 +6,7 @@
   "myPlan": "My Plan",
   "about": "About",
   "inputPlaceholder": "Type your message here...",
-  "tagline": "riuGPT uses GenAI, please review critical information using sources.",
+  "tagline": "AID uses GenAI, please review critical information using sources.",
   "sourceDocs": "Source",
   "none": "None",
   "cancel": "Cancel",
@@ -78,7 +78,7 @@
   "modals": {
     "uploadDoc": {
       "label": "Upload new document",
-      "select": "Choose how to upload your document to riuGPT",
+      "select": "Choose how to upload your document to AID",
       "file": "Upload from device",
       "back": "Back",
       "wait": "Please wait ...",
@@ -129,8 +129,8 @@
   },
   "sharedConv": {
     "subtitle": "Created with",
-    "button": "Get Started with riuGPT",
-    "meta": "riuGPT uses GenAI, please review critical information using sources."
+    "button": "Get Started with AID",
+    "meta": "AID uses GenAI, please review critical information using sources."
   },
   "convTile": {
     "share": "Share",

@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import DocsGPT3 from './assets/riu.png';
+import DocsGPT3 from './assets/aid.webp';
 import { useTranslation } from 'react-i18next';
 export default function Hero({
   handleQuestion,
@@ -23,7 +23,7 @@ export default function Hero({
     >
       <div className="flex h-full w-full flex-col items-center justify-center">
         <div className="flex items-center">
-          <span className="p-0 text-4xl font-semibold">riuGPT</span>
+          <span className="p-0 text-4xl font-semibold">AID</span>
           <img className="mb-1 inline w-14 p-0" src={DocsGPT3} alt="docsgpt" />
         </div>
 
