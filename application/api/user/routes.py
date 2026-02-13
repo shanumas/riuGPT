@@ -20,6 +20,11 @@ from application.utils import check_required_fields
 from application.vectorstore.vector_creator import VectorCreator
 from application.tts.google_tts import GoogleTTS
 
+from azure.storage.blob import BlobServiceClient
+
+blob_service_client = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
+container_client = blob_service_client.get_container_client(settings.AZURE_STORAGE_CONTAINER_NAME)
+
 mongo = MongoDB.get_client()
 db = mongo["docsgpt"]
 conversations_collection = db["conversations"]

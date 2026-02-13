@@ -1,0 +1,75 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  VITE_API_HOST: 'http://riugpt.southindia.cloudapp.azure.com:7091'
+  VITE_API_STREAMING: true
+  LLM_NAME: 'docsgpt'
+  USER_AGENT: 'myagent'
+  CELERY_BROKER_URL: 'redis://redis:6379/0'
+  CELERY_RESULT_BACKEND: 'redis://redis:6379/1'
+  MONGO_URI: 'mongodb://mongo:27017/docsgpt'
+  CACHE_REDIS_URL: 'redis://redis:6379/2'
+  dockerRegistryServiceConnection: 'e6c021b0-4243-40ec-a488-70d5a39cc029'
+
+jobs:
+- deployment: DeployToEnvironment
+  displayName: 'Deploy to riu-vm Environment'
+  environment: 
+    name: pipeline-env
+    resourceName: UMA
+    resourceType: VirtualMachine
+
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - script: echo Nilan Paps
+- job: BuildAndDeploy
+  steps:
+  - script: |
+      echo "Public IP:"
+      curl ifconfig.me
+      echo "Local IP:"
+      hostname -I
+    displayName: 'Find Agent IP Address'
+
+
+  - script: |
+      docker network create my-network || true
+      docker run -d --name redis --net my-network -p 6379:6379 redis:6-alpine
+      docker run -d --name mongo --net my-network -p 27017:27017 -v mongodb_data_container:/data/db mongo:6
+      # Build and run the frontend container
+      docker build -t frontend ./frontend
+      docker run -d --name frontend --net my-network -p 5173:5173 \
+        -v ./frontend/src:/app/src \
+        -e VITE_API_HOST=http://backend:7091 \
+        -e VITE_API_STREAMING=$VITE_API_STREAMING \
+        frontend
+
+      # Build and run the backend container
+      docker build -t backend ./application
+      docker run -d --name backend --net my-network -p 7091:7091 \
+        -v ./application/indexes:/app/application/indexes \
+        -v ./application/inputs:/app/application/inputs \
+        -v ./application/vectors:/app/application/vectors \
+        -e API_KEY=$API_KEY \
+        -e EMBEDDINGS_KEY=$API_KEY \
+        -e LLM_NAME=$LLM_NAME \
+        -e CELERY_BROKER_URL=redis://redis:6379/0 \
+        -e CELERY_RESULT_BACKEND=redis://redis:6379/1 \
+        -e MONGO_URI=mongodb://mongo:27017/docsgpt \
+        -e CACHE_REDIS_URL=redis://redis:6379/2 \
+        backend
+
+    displayName: 'Start all services (redis, mongo, frontend, backend)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish build artifacts'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
