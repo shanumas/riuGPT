@@ -9,37 +9,50 @@ prompt_user() {
     read -p "Enter your choice (1, 2 or 3): " choice
 }
 
+# Function to install Docker if not installed
+install_docker() {
+    echo "Docker is not installed. Installing Docker..."
+    # Install dependencies
+    sudo apt update
+    sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+    # Add Docker GPG key
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    # Add Docker repository
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # Install Docker
+    sudo apt update
+    sudo apt install -y docker-ce docker-ce-cli containerd.io
+    echo "Docker installed successfully."
+}
+
+# Function to check if Docker is installed
+check_docker_installed() {
+    if ! command -v docker &> /dev/null; then
+        install_docker
+    else
+        echo "Docker is already installed."
+    fi
+}
+
 check_and_start_docker() {
+    check_docker_installed
+
     # Check if Docker is running
     if ! docker info > /dev/null 2>&1; then
         echo "Docker is not running. Starting Docker..."
+        if ! pgrep -x "dockerd" > /dev/null; then
+            echo "Starting Docker daemon..."
+            sudo dockerd > /dev/null 2>&1 &
+            sleep 5
+        fi
 
-        # Check the operating system
-        case "$(uname -s)" in
-            Darwin)
-                open -a Docker
-                ;;
-            Linux)
-                sudo systemctl start docker
-                ;;
-            *)
-                echo "Unsupported platform. Please start Docker manually."
-                exit 1
-                ;;
-        esac
-
-        # Wait for Docker to be fully operational with animated dots
-        echo -n "Waiting for Docker to start"
-        while ! docker system info > /dev/null 2>&1; do
-            for i in {1..3}; do
-                echo -n "."
-                sleep 1
-            done
-            echo -ne "\rWaiting for Docker to start   " # Reset to overwrite previous dots
-        done
-
-        echo -e "\nDocker has started!"
+        # Verify Docker is running
+        if ! docker info > /dev/null 2>&1; then
+            echo "Failed to start Docker. Please start it manually."
+            exit 1
+        fi
     fi
+    echo "Docker is running."
 }
 
 # Function to handle the choice to download the model locally
@@ -54,24 +67,18 @@ download_locally() {
     
     # Downloading the model to the specific directory
     echo "Downloading the model..."
-    # check if docsgpt-7b-f16.gguf does not exist
     if [ ! -f models/docsgpt-7b-f16.gguf ]; then
-        echo "Downloading the model..."
         wget -P models https://d3dg1063dc54p9.cloudfront.net/models/docsgpt-7b-f16.gguf
         echo "Model downloaded to models directory."
     else
         echo "Model already exists."
     fi
-   
+
     # Call the function to check and start Docker if needed
     check_and_start_docker
 
     docker-compose -f docker-compose-local.yaml build && docker-compose -f docker-compose-local.yaml up -d
-    #python -m venv venv
-    #source venv/bin/activate
-    pip install -r application/requirements.txt
-    pip install llama-cpp-python
-    pip install sentence-transformers
+    pip install -r application/requirements.txt llama-cpp-python sentence-transformers
     export LLM_NAME=llama.cpp
     export EMBEDDINGS_NAME=huggingface_sentence-transformers/all-mpnet-base-v2
     export FLASK_APP=application/app.py
@@ -81,8 +88,7 @@ download_locally() {
     echo "The application is now running on http://localhost:5173"
     echo "You can stop the application by running the following command:"
     echo "Ctrl + C and then"
-    echo "Then pkill -f 'flask run' and then"
-    echo "docker-compose down"
+    echo "pkill -f 'flask run' && docker-compose down"
     flask run --host=0.0.0.0 --port=7091 &
     celery -A application.app.celery worker -l INFO
 }
@@ -121,20 +127,4 @@ use_docsgpt() {
 }
 
 # Prompt the user for their choice
-prompt_user
-
-# Handle the user's choice
-case $choice in
-    1)
-        use_docsgpt
-        ;;
-    2)
-        download_locally
-        ;;
-    3)
-        use_openai
-        ;;
-    *)
-        echo "Invalid choice. Please choose either 1 or 2."
-        ;;
-esac
+use_docsgpt
